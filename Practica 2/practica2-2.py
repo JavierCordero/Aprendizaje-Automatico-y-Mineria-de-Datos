@@ -92,5 +92,7 @@ pinta_frontera_curva(np.delete(Xpoly,0,axis=1),Y,T, landa)
 
 calcAciertos(Xpoly, Y, T)
 
+plt.text(0,1.3, str("λ: ") + str(landa))
+
 plt.legend()
 plt.show()

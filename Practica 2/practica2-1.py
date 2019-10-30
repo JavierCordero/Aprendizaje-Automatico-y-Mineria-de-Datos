@@ -15,9 +15,7 @@ def sigmoid(x):
     return s
 
 def cost(theta, X, Y):
-    # H = sigmoid(np.matmul(X, np.transpose(theta)))
     H = sigmoid(np.matmul(X, theta))
-    # cost = (- 1 / (len(X))) * np.sum( Y * np.log(H) + (1 - Y) * np.log(1 - H) )
     cost = (- 1 / (len(X))) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H)))
     return cost
 
@@ -67,6 +65,13 @@ def calcAciertos(X, Y, t):
     porcentaje = aciertos / totales * 100
     plt.text(82,100, str(porcentaje) + "% de aciertos")
 
+def dibuja_puntos(X, Y):
+    pos = np.where(Y == 1)
+    plt.scatter(X[pos, 0], X[pos, 1], marker = '+', c = 'red')
+
+    neg = np.where(Y == 0)
+    plt.scatter(X[neg, 0], X[neg, 1], marker = '.', c = 'blue')
+
 datos = carga_csv('ex2data1.csv')
 X = datos[:, :-1]
 np.shape(X)         
@@ -76,11 +81,7 @@ np.shape(Y)
 
 thetas = np.zeros(3)
 
-pos = np.where(Y == 1)
-plt.scatter(X[pos, 0], X[pos, 1], marker = '+', c = 'red')
-
-neg = np.where(Y == 0)
-plt.scatter(X[neg, 0], X[neg, 1], marker = '.', c = 'blue')
+dibuja_puntos(X, Y)
 
 m = np.shape(X)[0]
 n = np.shape(X)[1]
