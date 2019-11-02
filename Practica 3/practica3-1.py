@@ -11,7 +11,8 @@ def sigmoide(x):
 #Función para el coste
 def coste(theta, X, Y, landa):
     H = sigmoide(np.matmul(X, theta))
-    cost = (- 1 / (len(X))) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H))) + (landa / 2 * len(X) * np.sum((np.power(theta, 2))))
+    m = len(X)
+    cost = ((- 1 / m) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H)))) + ((landa / 2 * m) * (np.sum(np.power(theta, 2))))
     
     return cost
 
@@ -26,6 +27,7 @@ def gradiente(theta, XX, Y, landa):
     firstPart = grad+(landa*aux/m)
     thetaAux = theta
     thetaAux[0] = 0
+
     result = firstPart + (landa / m * thetaAux)
     return result
 
@@ -34,10 +36,7 @@ def calcOptTheta(Y):
     return result[0]
 
 def oneVsAll(X, y, num_etiquetas, reg):
-    """oneVSAll entrena varios clasificadores por regresión logística con término
-       de regularización 'reg' y devuelve el resultado en una matriz, donde
-       la fila i-ésima corresponde al clasificadore de la etiqueta i-ésima. 
-    """
+    
     ThetasMatriz = np.zeros((num_etiquetas, X.shape[1]))
 
     i = 0
@@ -60,23 +59,26 @@ def calcAciertos(X, Y, t):
     cont = 0
     aciertos = 0
     totales = len(Y)
+    dimThetas = len(t)
+    valores = np.zeros(dimThetas)
 
-    for i in X:    
-        maxvalor=-1   
-        if Y[cont] == 10:
-            aux = 0
-        else: aux = Y[cont]
-        for x in range(len(t)):
-            valor = sigmoide(np.dot(i, t[aux]))
-            if(valor>maxvalor):
-                maxvalor=valor
-                thetaIesimo=x+1
+    for i in X:      
+        p = 0
+        for x in range(dimThetas):
+            valores[p] = sigmoide(np.dot(i, t[x]))
+            p+=1
+       
+        r = np.argmax(valores)
+        if r == 0:
+            r = 10
 
-        if(thetaIesimo==Y[cont]):aciertos+=1     
+        #print(str(r) + "------>" + str(Y[cont]))
+
+        if(r==Y[cont]):
+            aciertos+=1     
 
         cont += 1
 
-    print(aciertos)
     porcentaje = aciertos / totales * 100
     return porcentaje
 
@@ -95,7 +97,7 @@ y = datos["y"]
 X = datos["X"]
 yaux = np.ravel(y) 
 
-landa = 2
+landa = 1
 
 #print(oneVsAll(X, yaux, 10, landa))
 print(str(calcAciertos(X, yaux, oneVsAll(X, yaux, 10, landa))) + "% de acierto")
