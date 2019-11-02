@@ -12,7 +12,7 @@ def sigmoide(x):
 def coste(theta, X, Y, landa):
     H = sigmoide(np.matmul(X, theta))
     m = len(X)
-    cost = ((- 1 / m) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H)))) + ((landa / 2 * m) * (np.sum(np.power(theta, 2))))
+    cost = ((- 1 / m) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H)))) + ((landa / (2 * m)) * (np.sum(np.power(theta, 2))))
     
     return cost
 
