@@ -99,8 +99,12 @@ yaux = np.ravel(y)
 
 landa = 1
 
-#print(oneVsAll(X, yaux, 10, landa))
-print(str(calcAciertos(X, yaux, oneVsAll(X, yaux, 10, landa))) + "% de acierto")
+#pinta_aleatorio(X)
+
+result = str(calcAciertos(X, yaux, oneVsAll(X, yaux, 10, landa))) + "% de acierto"
+
+plt.text(0,0, result)
+plt.axis("off")
 
 #Mostramos los datos finalmente
 plt.show()   
