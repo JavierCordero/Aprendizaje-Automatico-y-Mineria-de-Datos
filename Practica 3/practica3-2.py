@@ -12,23 +12,15 @@ def calcAciertos(X, Y, t):
     #X = todas las X
     #Y = la Y de cada fila de X
     #t = cada fila de la matriz de thetas
-    cont = 0
     aciertos = 0
     totales = len(Y)
     dimThetas = len(t)
 
     for i in range(dimThetas):
-        r = np.argmax(t[i])
-
-        if r == 9:
-            r = 10
-        else: r+=1
+        r = np.argmax(t[i]) + 1
         #print(str(r) + "------>" + str(Y[cont]))
-
-        if(r==Y[cont]):
+        if(r==Y[i]):
             aciertos+=1     
-
-        cont += 1
 
     porcentaje = aciertos / totales * 100
     return porcentaje
