@@ -9,37 +9,53 @@ def sigmoide(x):
     s = 1 / (1 + np.exp(-x))
     return s
 
-def pinta_aleatorio(X):
-    sample = np.random.choice(X.shape[0], 10)
-    aux = X[sample, :].reshape(-1, 20)
-    plt.imshow(aux.T)
-    plt.axis("off")
-
 #Función para el coste
-def coste(theta1, theta2, X, Y, landa):
-    H = propagacion_hacia_delante(X, theta1, theta2)
-    m = len(X)
-    cost = ((- 1 / m) * (np.dot(Y, np.log(H)) + np.dot((1 - Y), np.log(1 - H)))) # + ((landa / (2 * m)) * (np.sum(np.power(theta, 2))))
-    print (cost)
+def coste_vectorizado(h, X, Y, landa):
+  m = len(X)
+  J = 0
+
+  for i in range(m):
+    J += np.sum(-Y[i] * mp.log(h[i]) - (1 - Y[i])* np.log(1 - h[i]))
+
+  return J/float(m)  
 
 #backprop devuelve el coste y el gradiente de una red neuronal de dos capas.    
 def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     theta1 = np.reshape(params_rn[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1)))
     theta2 = np.reshape(params_rn [num_ocultas * (num_entradas + 1 ):], (num_etiquetas, (num_ocultas + 1)))
-    coste(theta1, theta2, X, y,reg)
     
+    m = X.shape[0]
+  
     a1, z2, a2, z3, h = propagacion_hacia_delante(X, theta1, theta2)
 
-    d3 = np.hstack([np.ones([m, 1]), sigmoide(z3)])
+    #Aqui ya tenemos el coste de la función
+    coste = coste_vectorizado(h, X, y, landa)
+    print(coste)
+    #Calculo para el gradiante
+    for t in range(m):
+      a1t = a1[t, :] # (1, 401)
+      a2t = a2[t, :] # (1, 26)
+      ht = h[t, :] # (1, 10)
+      yt = y[t] # (1, 10)
+      d3t = ht - yt # (1, 10)
+      d2t = np.dot(theta2.T, d3t) * (a2t * (1 - a2t)) # (1, 26)
+      delta1 = delta1 + np.dot(d2t[1:, np.newaxis], a1t[np.newaxis, :])
+      delta2 = delta2 + np.dot(d3t[:, np.newaxis], a2t[np.newaxis, :])
 
-    d2 = np.dot(d3, theta2.T) * np.hstack([np.ones([m, 1]), sigmoide(z2)])
+    #En este momento, tenemos calculado el gradiante de la función
+    #Tenemos que sacar D(i,j)1 y D(i,j)2, que son las MATRICES de los gradientes.
+    #Una vez tengamos estas dos matrices, las tenemos que poner en un vector que sea D1 + D2
+    #La formula para DN = 1/m * deltaN + lambda*ThetaN si j != 0
+    # o  DN = 1/m * deltaN para n == 0
 
-    #Hay que quitar la primera columna de delta2 sabe dios como
+    #para hacer "unroll" de matrices es Delta1 = np.reshape(delta1[1:110], (10,11)); Cambiando los números por los tamaños que sean
 
-    delta1 = delta1 + d2 * a1.T
+    #Para concatenar dos vectores, np.concatenate(delta1, delta2);
 
-    delta2 = delta2 + d3 * a2.T
+    #GradianteFinal = np.concatenate(delta1, delta2)
+    #Devolver el coste y el nuevo vector V (que es D1 + D2)
 
+    return coste#, GradianteFinal
 
 def propagacion_hacia_delante(X, theta1, theta2):
     m = X.shape[0]
@@ -49,117 +65,33 @@ def propagacion_hacia_delante(X, theta1, theta2):
     z3 = np.dot(a2, theta2.T)
     h = sigmoide(z3)
     return a1, z2, a2, z3, h
-datos = loadmat ("ex4data1.mat")
+
+data = loadmat ("ex4data1.mat")
 
 #almacenamos los datos leídos en X e y
-X = datos["X"]
-Y = datos["y"]
+y = data['y'].ravel() # (5000, 1) --> (5000,)
+X = data['X']
+
+m = len(y)
+input_size = X.shape[1]
+num_labels = 10
+capa_oculta = 25
+y = (y - 1)
+y_onehot = np.zeros((m, num_labels))  # 5000 x 10
+
+for i in range(m):
+  y_onehot[i][y[i]] = 1
 
 weights = loadmat ("ex4weights.mat")
 theta1, theta2 = weights["Theta1"], weights["Theta2"]
 # Theta1 es de dimensión 25 x 401
 # Theta2 es de dimensión 10 x 26
 
-frame1 = """
-   _________
-   |       |
-   |       |
- -------------
-  ***    ***
-   ^      ^
-      ||
-      --  
-       
-      ||
-  """
+theta1Reshaped = theta1.reshape((1, 25*401))
+theta2Reshaped = theta2.reshape((1, 10*26))
 
-frame2 = """
-   _________
-   |       |
-   |       |
- -------------
-  ***    ***
-   ^      ^
-      ||
-      --  
-       _
-      |_|
-  """
-frame3 = """
-   _________
-   |       |
-   |       |
- -------------
-  ***    ***
-   ^      ^
-      ||
-      --  
-      __ 
-     |__|
-  """
+params = np.concatenate(theta1Reshaped, theta2Reshaped)
 
-frame4  = """
-   _________
-   |       |
-   |       |
- -------------
-  ***    ***
-   ^      ^
-      ||
-      --  
-     ____ 
-    |____|  
-           
-  """
-
-frame5  = """
-   _________
-   |       |
-   |       |
- -------------
-  ***    ***
-   ^     ---
-      ||
-      --  
-     ____    ________
-    |____|  <__MUACK_|
-           
-  """
-
-clear = lambda: os.system('cls') #on Windows System
-
-while(1):
-    clear()
-    print(frame1)
-    time.sleep(0.1)
-
-    clear()
-    print(frame2)
-    time.sleep(0.1)
-
-    clear()
-    print(frame3)
-    time.sleep(0.1)
-
-    clear()
-    print(frame4)
-    time.sleep(0.1)
-
-    clear()
-    print(frame3)
-    time.sleep(0.1)
-
-    clear()
-    print(frame2)
-    time.sleep(0.1)
-
-    clear()
-    print(frame1)
-    time.sleep(0.1)
-
-    clear()
-    print(frame5)
-    time.sleep(2)
-#yaux = np.ravel(Y)     
+backprop(parms, input_size, capa_oculta,num_labels, X, y, 0)
 
 plt.show()
