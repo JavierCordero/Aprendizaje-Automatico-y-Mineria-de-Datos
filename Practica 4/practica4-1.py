@@ -9,28 +9,34 @@ def sigmoide(x):
     s = 1 / (1 + np.exp(-x))
     return s
 
-#Función para el coste
-def coste_vectorizado(h, X, Y, landa):
+def coste(h, Y, X):
   m = len(X)
-  J = 0
+  coste = ((- 1 / m) * (np.dot(Y, np.log(h)) + np.dot((1 - Y), np.log(1 - h))))
 
-  for i in range(m):
-    J += np.sum(-Y[i] * mp.log(h[i]) - (1 - Y[i])* np.log(1 - h[i]))
+  return coste
 
-  return J/float(m)  
+#Función para el coste
+def coste_regularizado(h, X, Y, landa, theta1, theta2):
+    m = len(X)
+    
+    cost = coste(h, Y, X) + ((landa / (2 * m) )
+    
+    return cost    
+
 
 #backprop devuelve el coste y el gradiente de una red neuronal de dos capas.    
 def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     theta1 = np.reshape(params_rn[:num_ocultas * (num_entradas + 1)], (num_ocultas, (num_entradas + 1)))
     theta2 = np.reshape(params_rn [num_ocultas * (num_entradas + 1 ):], (num_etiquetas, (num_ocultas + 1)))
-    
+
     m = X.shape[0]
   
     a1, z2, a2, z3, h = propagacion_hacia_delante(X, theta1, theta2)
 
     #Aqui ya tenemos el coste de la función
-    coste = coste_vectorizado(h, X, y, landa)
-    print(coste)
+    c = coste_regularizado(h, X, y, landa, theta1, theta2)
+    print(c)
+
     #Calculo para el gradiante
     for t in range(m):
       a1t = a1[t, :] # (1, 401)
@@ -55,7 +61,7 @@ def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     #GradianteFinal = np.concatenate(delta1, delta2)
     #Devolver el coste y el nuevo vector V (que es D1 + D2)
 
-    return coste#, GradianteFinal
+    return coste_regularizado#, GradianteFinal
 
 def propagacion_hacia_delante(X, theta1, theta2):
     m = X.shape[0]
@@ -67,6 +73,8 @@ def propagacion_hacia_delante(X, theta1, theta2):
     return a1, z2, a2, z3, h
 
 data = loadmat ("ex4data1.mat")
+
+landa = 1
 
 #almacenamos los datos leídos en X e y
 y = data['y'].ravel() # (5000, 1) --> (5000,)
@@ -87,11 +95,11 @@ theta1, theta2 = weights["Theta1"], weights["Theta2"]
 # Theta1 es de dimensión 25 x 401
 # Theta2 es de dimensión 10 x 26
 
-theta1Reshaped = theta1.reshape((1, 25*401))
-theta2Reshaped = theta2.reshape((1, 10*26))
+theta1Reshaped = theta1.ravel()
+theta2Reshaped = theta2.ravel()
 
-params = np.concatenate(theta1Reshaped, theta2Reshaped)
+params = np.concatenate((theta1Reshaped, theta2Reshaped))
 
-backprop(parms, input_size, capa_oculta,num_labels, X, y, 0)
+backprop(params, input_size, capa_oculta,num_labels, X, y, 0)
 
 plt.show()
