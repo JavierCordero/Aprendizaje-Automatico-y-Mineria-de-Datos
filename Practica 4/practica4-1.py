@@ -1,28 +1,19 @@
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
-import time
-import os
 
 #Función sigmoide
 def sigmoide(x):
     s = 1 / (1 + np.exp(-x))
     return s
 
-def coste(h, Y, X):
-  m = len(X)
-  coste = ((- 1 / m) * (np.dot(Y, np.log(h)) + np.dot((1 - Y), np.log(1 - h))))
-
-  return coste
+def coste(h, Y, m):
+  return ((1 / m) * (np.sum(np.dot(-Y, np.log(h)) - np.dot((1 - Y), np.log(1 - h)))))
 
 #Función para el coste
-def coste_regularizado(h, X, Y, landa, theta1, theta2):
-    m = len(X)
-    
-    cost = coste(h, Y, X) + ((landa / (2 * m) )
-    
-    return cost    
-
+def coste_regularizado(h, X, Y, reg, theta1, theta2):
+  m = X.shape[0]
+  return coste(h, Y, m) + ((reg / (2 * m)) * ((np.sum(np.square(theta1[:, 1:]))) + (np.sum(np.square(theta2[:,1:])))))    
 
 #backprop devuelve el coste y el gradiente de una red neuronal de dos capas.    
 def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
@@ -34,8 +25,11 @@ def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     a1, z2, a2, z3, h = propagacion_hacia_delante(X, theta1, theta2)
 
     #Aqui ya tenemos el coste de la función
-    c = coste_regularizado(h, X, y, landa, theta1, theta2)
+    c = coste_regularizado(h, X, y, reg, theta1, theta2)
     print(c)
+
+    delta1 = 0
+    delta2 = 0
 
     #Calculo para el gradiante
     for t in range(m):
