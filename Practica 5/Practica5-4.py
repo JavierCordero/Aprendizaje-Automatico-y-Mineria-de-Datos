@@ -43,30 +43,26 @@ def calcOptTheta(X, Y, landa):
 
 def curva_aprendizaje(X, y, landa, Xval, yval):
 
-    err1 = np.zeros((len(X)))
-    err2 = np.zeros((len(X)))
+    err1 = np.zeros((len(landa)))
+    err2 = np.zeros((len(landa)))
 
-    i = 1
-    while (i < len(X) + 1):
-        thetas = calcOptTheta(X[0:i], y[0:i], landa)
+    i = 0
+    while (i < len(landa)):
+        thetas = calcOptTheta(X, y, landa[i])
 
-        err1[i - 1] = coste_y_gradiente(thetas, X[0:i], y[0:i], landa, len(X))[0]
-        err2[i - 1] = coste_y_gradiente(thetas, Xval, yval, landa, len(Xval))[0]
+        #IMPORTANTE que landa tiene que ser 0 aquí 
+        err1[i] = coste_y_gradiente(thetas, X, y, 0, len(X))[0]
+        err2[i] = coste_y_gradiente(thetas, Xval, yval, 0, len(Xval))[0]
         i += 1   
 
     return err1, err2    
 
-def pinta_puntos(X, Y):
-    plt.scatter(X, Y, 100,  marker = 'x', c = 'red', label = 'Entrada')
-
-def pinta_Curva_Aprendizaje(err1, err2):
-    
-    a = np.arange(len(err1))
+def pinta_Curva_Aprendizaje(landaV, err1, err2):
     b = err1
-    plt.plot(a, b, c="blue", label="Train")
+    plt.plot(landaV, b, c="blue", label="Train")
 
-    d = err2[0:len(err1)]
-    plt.plot(a, d, c="orange", label="Cross Validation")
+    d = err2
+    plt.plot(landaV, d, c="orange", label="Cross Validation")
 
 def normaliza_Matriz(X):
     mu = np.mean(X, axis=0)
@@ -83,14 +79,6 @@ def transforma_entrada(X, p):
         nX = np.column_stack((nX, np.power(X, i+1)))   
 
     return nX
-    
-def regresion_Polinomial(X, p, mu, sigma, theta):
-    x = np.array(np.arange(min(X) - 5,  max(X) + 6, 0.02))
-    nX = transforma_entrada(x, p)
-    nX = nX - mu
-    nX = nX / sigma
-    nX = np.insert(nX, 0, 1, axis=1)
-    plt.plot(x, np.dot(nX, theta))
 
 def main():
     data = loadmat("ex5data1.mat")
@@ -99,32 +87,42 @@ def main():
     y = data["y"]
     Xval = data["Xval"]
     yval = data["yval"]
-    #Xtest = data["Xtest"]
-    #ytest = data["ytest"]
+    Xtest = data["Xtest"]
+    ytest = data["ytest"]
 
-    landa = 0
+    landas = np.array([0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10])
     p = 8
 
     nuevaentrada = transforma_entrada(X, p)
     nuevaentrada, mu, sigma = normaliza_Matriz(nuevaentrada)
     nuevaentrada = np.insert(nuevaentrada, 0, 1, axis=1)  
     
-    thetaOpt = calcOptTheta(nuevaentrada, y, landa)
-    regresion_Polinomial(X, p, mu, sigma, thetaOpt)
-    
-    pinta_puntos(X,y)
-    plt.show()
-
     neuvaEntradaValidacion = transforma_entrada(Xval, p)
     neuvaEntradaValidacion = neuvaEntradaValidacion - mu
     neuvaEntradaValidacion = neuvaEntradaValidacion / sigma
     neuvaEntradaValidacion = np.insert(neuvaEntradaValidacion, 0, 1, axis=1)
 
-    err1, err2 = curva_aprendizaje(nuevaentrada, y, landa, neuvaEntradaValidacion, yval)
+    err1, err2 = curva_aprendizaje(nuevaentrada, y, landas, neuvaEntradaValidacion, yval)  
 
- 
-    pinta_Curva_Aprendizaje(err1, err2)
+    pinta_Curva_Aprendizaje(landas, err1, err2)
+    
 
+    #De todo esto anterior, sacamos como conclusión que el valor óptimo para lambda
+    # es 3, por lo que ahora, con los ejemplos de test comprobaremos el error obtenido
+    landa = 3
+    
+    neuvaEntradaTest = transforma_entrada(Xtest, p)
+    neuvaEntradaTest = neuvaEntradaTest - mu
+    neuvaEntradaTest = neuvaEntradaTest / sigma
+    neuvaEntradaTest = np.insert(neuvaEntradaTest, 0, 1, axis=1)
+
+    optTheta = calcOptTheta(nuevaentrada, y, landa)
+
+    # Get the test error with lambda_coef set to 0!!!
+    error_test = coste_y_gradiente(optTheta, neuvaEntradaTest, ytest, 0, len(neuvaEntradaTest))[0] #[0] para que lo que devuelva sea el coste
+
+    print("Error obtenido de: ", error_test)
+   
     plt.show()
 
 main()
