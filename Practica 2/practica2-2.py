@@ -35,13 +35,26 @@ def calcOptTheta():
     result = opt.fmin_tnc(func=cost, x0=np.zeros(Xpoly.shape[1]), fprime=gradient, args=(Xpoly, Y, landa))
     return result[0]
 
-def pinta_frontera_curva(X, Y, theta, landa):
-    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
-    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
-    xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
-    h = sigmoid(poly.fit_transform(np.c_[xx1.ravel(), xx2.ravel()]).dot(theta))
-    h = h.reshape(xx1.shape)
-    plt.contour(xx1, xx2, h, [0.5], linewidths=2, colors='green')  
+def gaussianKernel(X1, X2, sigma):
+    Gram = np.zeros((X1.shape[0], X2.shape[0]))
+    for i, x1 in enumerate(X1):
+        for j, x2 in enumerate(X2):
+            x1 = x1.ravel()
+            x2 = x2.ravel()
+            Gram[i, j] = np.exp(-np.sum(np.square(x1 - x2)) / (2 * (sigma**2)))
+    return Gram    
+
+def pinta_frontera_curva(X, Y, model, sigma):
+    x1plot = np.linspace(X[:,0].min(), X[:,0].max(), 100).T
+    x2plot = np.linspace(X[:,1].min(), X[:,1].max(), 100).T
+    X1, X2 = np.meshgrid(x1plot, x2plot)
+    vals = np.zeros(X1.shape)
+    for i in range(X1.shape[1]):
+        this_X = np.column_stack((X1[:, i], X2[:, i]))
+        vals[:, i] = model.predict(gaussianKernel(this_X, X, sigma))
+
+    # Plot the SVM boundary
+    plt.contour(X1, X2, vals, colors="blue")
 
 def pinta_puntos(X, Y):
     

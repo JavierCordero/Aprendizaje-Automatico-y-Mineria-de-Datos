@@ -12,7 +12,7 @@ def sigmoide(x):
 
 # Cálculo de la derivada de la función sigmoide
 def derivada_sigmoide(x):
-    return (sigmoide(x) * (1.0 - sigmoid(x)))
+    return (sigmoide(x) * (1.0 - sigmoide(x)))
 
 # Cáculo del coste no regularizado
 def coste(m, h, y):
@@ -27,7 +27,7 @@ def coste(m, h, y):
 def costeRegularizado(m, h, Y, reg, theta1, theta2):
     return coste(m, h, Y) + ((reg / (2 * m)) * ((np.sum(np.square(theta1[:, 1:]))) + (np.sum(np.square(theta2[:,1:])))))    
 
-# Devuelve "Y" a partir de una X y no unos pesos determinados
+#Devuelve la salida de la red neuronal así como los valores individuales
 def PropagacionHaciaDelante(X, theta1, theta2):
     m = X.shape[0]
     a1 = np.hstack([np.ones([m, 1]), X])
@@ -109,6 +109,7 @@ X = data["X"]
 num_entradas = X.shape[1]
 capa_oculta = 25
 num_labels = 10
+landa = 1
 
 lenY = len(y)
 y = (y - 1)
@@ -134,7 +135,7 @@ params = np.concatenate(unrolled_Thetas)
 # Obtención de los pesos óptimos entrenando una red con los pesos aleatorios
 optTheta = opt.minimize(fun=backprop, x0=params, 
         args=(num_entradas, capa_oculta, num_labels,
-        X, y_onehot, 1), method='TNC', jac=True,
+        X, y_onehot, landa), method='TNC', jac=True,
         options={'maxiter': 70})
 
 #Calculo de la precision del gradiante gracias a checkNNGradients
