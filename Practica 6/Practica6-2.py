@@ -51,6 +51,9 @@ def main():
     X = np.concatenate((X, XnoSpam))
     y = np.concatenate((y, yNoSpam))
 
+    pinta_puntos(X, y)
+    plt.show()
+
     print("Entrenando la red...")
 
     C = 0.1

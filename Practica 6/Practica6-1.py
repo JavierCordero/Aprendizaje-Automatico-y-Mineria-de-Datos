@@ -31,7 +31,6 @@ def gaussianKernel(X1, X2, sigma):
 
 def pinta_frontera_curva(X, y, model, sigma):
    
-    # Make classification predictions over a grid of values.
     x1plot = np.linspace(X[:,0].min(), X[:,0].max(), 100).T
     x2plot = np.linspace(X[:,1].min(), X[:,1].max(), 100).T
     X1, X2 = np.meshgrid(x1plot, x2plot)
@@ -50,6 +49,9 @@ def parte1():
     yravel = np.ravel(y)
 
     Coef = 1.0
+
+    pinta_puntos(X, yravel)
+    plt.show()
 
     svm = supportVectorMachine.SVC(kernel="linear", C=Coef)
     svm = svm.fit(X, yravel)
@@ -81,10 +83,10 @@ def parte2():
 
     pinta_puntos(X,yravel)
 
-    model = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
-    model = model.fit(gaussianKernel(X, X, sigma=sigma), yravel)
+    svm = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
+    svm = svm.fit(gaussianKernel(X, X, sigma=sigma), yravel)
 
-    pinta_frontera_curva(X, y, model, sigma)
+    pinta_frontera_curva(X, y, svm, sigma)
 
     plt.show()
 
@@ -110,7 +112,7 @@ def parte3():
 
     for x in range(8):
         for j in range(8):
-            # Train the model on X and y.
+            #Entrena el modelo para x e y
             model = supportVectorMachine.SVC(C=coefVal, kernel='precomputed', tol= 1e-3, max_iter= 100)
             model = model.fit(gaussianKernel(X, X, sigma=sigmaVal), yravel)
 
@@ -125,13 +127,10 @@ def parte3():
 
     Coef, sigma = min(predictions, key=predictions.get)
 
-    Coef = 0.81
-    sigma = 0.03
+    svm = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
+    svm = svm.fit(gaussianKernel(X, X, sigma=sigma), yravel)
 
-    model = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
-    model = model.fit(gaussianKernel(X, X, sigma=sigma), yravel)
-
-    pinta_frontera_curva(X, y, model, sigma)
+    pinta_frontera_curva(X, y, svm, sigma)
   
     plt.show()
 
