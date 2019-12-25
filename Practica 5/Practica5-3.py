@@ -84,7 +84,7 @@ def transforma_entrada(X, p):
 
     return nX
     
-def regresion_Polinomial(X, p, mu, sigma, theta):
+def pinta_regresion_Polinomial(X, p, mu, sigma, theta):
     x = np.array(np.arange(min(X) - 5,  max(X) + 6, 0.02))
     nX = transforma_entrada(x, p)
     nX = nX - mu
@@ -99,8 +99,6 @@ def main():
     y = data["y"]
     Xval = data["Xval"]
     yval = data["yval"]
-    #Xtest = data["Xtest"]
-    #ytest = data["ytest"]
 
     landa = 0
     p = 8
@@ -110,7 +108,7 @@ def main():
     nuevaentrada = np.insert(nuevaentrada, 0, 1, axis=1)  
     
     thetaOpt = calcOptTheta(nuevaentrada, y, landa)
-    regresion_Polinomial(X, p, mu, sigma, thetaOpt)
+    pinta_regresion_Polinomial(X, p, mu, sigma, thetaOpt)
     
     pinta_puntos(X,y)
     plt.show()
@@ -122,7 +120,6 @@ def main():
 
     err1, err2 = curva_aprendizaje(nuevaentrada, y, landa, neuvaEntradaValidacion, yval)
 
- 
     pinta_Curva_Aprendizaje(err1, err2)
 
     plt.show()

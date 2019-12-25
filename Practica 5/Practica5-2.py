@@ -25,22 +25,6 @@ def calcOptTheta(X, Y, landa, theta):
     result = opt.fmin_tnc(func=coste, x0=theta, fprime=gradiente, args=(X, Y, landa, X.shape[0]))
     return result[0]
 
-def pinta_puntos(X, Y):
-    plt.scatter(X, Y, marker = 'x', c = 'red', label = 'Entrada')
-
-def pinta_Recta(T, x, y):
-    x =  np.arange(np.min(x[:, 1]), np.max(x[:, 1]), 0.1)
-    y = x.copy()
-
-    a = len(x)
-    i = 0
-
-    while (i < a):
-            y[i] = (x[i] * T[1]) + T[0]
-            i = i + 1
-    
-    plt.plot(x, y, c='blue')
-
 def curva_aprendizaje(X, y, landa, theta, Xval, yval):
 
     err1 = np.zeros((len(X)))
@@ -76,8 +60,6 @@ def main():
     y = data["y"]
     Xval = data["Xval"]
     yval = data["yval"]
-    Xtest = data["Xtest"]
-    ytest = data["ytest"]
 
     landa = 0
 

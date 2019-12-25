@@ -118,7 +118,7 @@ def main():
 
     optTheta = calcOptTheta(nuevaentrada, y, landa)
 
-    # Get the test error with lambda_coef set to 0!!!
+    #Lambda siempre = 0
     error_test = coste_y_gradiente(optTheta, neuvaEntradaTest, ytest, 0, len(neuvaEntradaTest))[0] #[0] para que lo que devuelva sea el coste
 
     print("Error obtenido de: ", error_test)

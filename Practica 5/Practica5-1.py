@@ -3,9 +3,6 @@ from scipy.io import loadmat
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
 
-def sigmoide(x):
-    return 1 / (1 + np.exp(-x))
-
 #Función para el coste
 def coste(theta, X, y, landa, m):
     h = np.dot(X, theta[:, None])
@@ -46,24 +43,12 @@ def main():
 
     X = data["X"]
     y = data["y"]
-    Xval = data["Xval"]
-    yval = data["yval"]
-    Xtest = data["Xtest"]
-    ytest = data["ytest"]
 
     landa = 0
 
     XwithOnes=np.hstack((np.ones(shape=(X.shape[0],1)),X))
 
     theta = np.ones(XwithOnes.shape[1])
-
-    #print("Coste: ", str(coste(theta, XwithOnes, y, landa, XwithOnes.shape[0])))
-    #print("Gradiante: ", str(gradiente(theta, XwithOnes, y, landa, XwithOnes.shape[0])))
-
-    print(len(XwithOnes))
-    print(len(XwithOnes[0]))
-    print(len(y))
-    print(len(y[0]))
 
     thetaOpt = calcOptTheta(XwithOnes, y, landa, theta)
 
