@@ -65,10 +65,13 @@ def calcAciertos(X, Y, t):
 
     for i in X:      
         p = 0
+        print(len(dimThetas))
         for x in range(dimThetas):
             valores[p] = sigmoide(np.dot(i, t[x]))
             p+=1
        
+        print(valores)
+
         r = np.argmax(valores)
         if r == 0:
             r = 10
