@@ -33,7 +33,17 @@ def gradiente(theta, XX, Y, landa):
     return result
 
 def calcOptTheta(Y):
-    result = opt.fmin_tnc(func=coste, x0=np.zeros(X.shape[1]), fprime=gradiente, args=(X, Y, landa))
+    #result = opt.fmin_tnc(func=coste, x0=np.zeros(X.shape[1]), fprime=gradiente, args=(X, Y, landa))
+    #return result[0]
+
+    result = opt.minimize(
+        fun=coste, 
+        x0=np.zeros(X.shape[1]), 
+        args=(X, Y, landa), 
+        method='TNC', 
+        jac=True, 
+        options={'maxiter':200})
+
     return result[0]
 
 def oneVsAll(X, y, num_etiquetas, reg):
