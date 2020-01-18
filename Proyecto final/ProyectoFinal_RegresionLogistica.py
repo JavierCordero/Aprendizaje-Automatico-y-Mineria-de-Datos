@@ -2,6 +2,7 @@ from scipy.io import loadmat
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
+import os
 
 #Función sigmoide
 def sigmoide(x):
@@ -32,19 +33,21 @@ def gradiente(theta, XX, Y, landa):
     result = firstPart + (landa / m * thetaAux)
     return result
 
+def coste_y_gradiente(x0, X, Y, landa):
+    return coste(x0,X,Y,landa), gradiente(x0, X, Y, landa)
+
 def calcOptTheta(Y):
     #result = opt.fmin_tnc(func=coste, x0=np.zeros(X.shape[1]), fprime=gradiente, args=(X, Y, landa))
     #return result[0]
-
     result = opt.minimize(
-        fun=coste, 
+        fun=coste_y_gradiente, 
         x0=np.zeros(X.shape[1]), 
         args=(X, Y, landa), 
         method='TNC', 
         jac=True, 
-        options={'maxiter':200})
+        options={'maxiter': 200})
 
-    return result[0]
+    return result.x
 
 def oneVsAll(X, y, num_etiquetas, reg):
     
@@ -52,6 +55,10 @@ def oneVsAll(X, y, num_etiquetas, reg):
 
     i = 0
     while i < num_etiquetas:
+
+        os.system('cls')
+        print("Numero de etiquetas procesadas: ", i + 1, " de un total de ", num_etiquetas)
+
         auxY = (y == y[i]).astype(int)
 
         ThetasMatriz[i, :] = calcOptTheta(auxY)
@@ -81,7 +88,7 @@ def calcAciertos(X, Y, t):
 
         sistema = ""
 
-        if r * 1000 < 50:
+        if r * 1000 < 60:
             sistema = "new_whale"
         else: sistema = Y[r]
 
@@ -116,7 +123,9 @@ landa = 1
 
 num_labels = len(np.unique(yaux))
 
-print(str(calcAciertos(X, yaux, oneVsAll(X, yaux, num_labels, landa))) + "% de acierto")
+one = oneVsAll(X, yaux, num_labels, landa)
+
+print(str(calcAciertos(X, yaux, one)) + "% de acierto")
 
 #Mostramos los datos finalmente
 plt.show()  

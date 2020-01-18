@@ -41,14 +41,14 @@ def transform_images_inside_path(path, outputName):
         os.system("cls")
        
         img = Image.open(path + f)
-        img = img.resize((50, 50), Image.ANTIALIAS) #Reescalamos la imagen
+        img = img.resize((20, 20), Image.ANTIALIAS) #Reescalamos la imagen
         img.save(path + "Resized/" + f[:-4] + "_resized.jpg")
         
         processedImage = True
         values = []
         pix  = img.load()
-        for i in range(50):
-            for j in range(50): 
+        for i in range(20):
+            for j in range(20): 
                 rgb = pix[i,j]
                 try:
                     rgbInteger = (int)(("%02x%02x%02x"%rgb), 16)
