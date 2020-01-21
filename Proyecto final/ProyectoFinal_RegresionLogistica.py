@@ -45,7 +45,7 @@ def calcOptTheta(Y):
         args=(X, Y, landa), 
         method='TNC', 
         jac=True, 
-        options={'maxiter': 200})
+        options={'maxiter': 70})
 
     return result.x
 
@@ -86,13 +86,11 @@ def calcAciertos(X, Y, t):
         valores = np.where(valores > 0.1, 0, valores)
         r = np.argmax(valores)
 
-        sistema = ""
-
         if r * 1000 < 60:
-            sistema = "new_whale"
+            sistema = 1
         else: sistema = Y[r]
 
-        print(sistema + "------>" + str(Y[cont]))
+        print(sistema , "------>" ,(Y[cont]))
 
         if(sistema==Y[cont]):
             aciertos+=1     

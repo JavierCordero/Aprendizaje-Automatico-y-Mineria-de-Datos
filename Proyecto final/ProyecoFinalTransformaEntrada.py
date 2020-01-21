@@ -59,18 +59,20 @@ def transform_images_inside_path(path, outputName):
         if(processedImage):
             aux, aux2 = np.where(y == f)
 
+            index, = np.where(np.unique(y[:, 1]) == (y[aux,1]))
+
             #Dividir en entrenamiento 60%, validación 20% y test 20%
             if procesImages - 1 < (int)(0.2 * totalFiles):
                 matTestX.append(values)
-                matTestY.append(y[aux,1])
+                matTestY.append(index)
 
             elif procesImages - 1 < (int)(0.4 * totalFiles):
                 matValidacionX.append(values)
-                matValidacionY.append(y[aux, 1])
+                matValidacionY.append(index)
 
             else:
                 matEntrenamientoX.append(values)
-                matEntreanmientoY.append(y[aux,1])
+                matEntreanmientoY.append(index)
 
             print("Se han procesado ", procesImages, " imagenes de un total de ", totalFiles)
             procesImages += 1
