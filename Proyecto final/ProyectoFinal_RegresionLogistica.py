@@ -58,9 +58,7 @@ def oneVsAll(X, y, num_etiquetas, reg):
 
         os.system('cls')
         print("Numero de etiquetas procesadas: ", i + 1, " de un total de ", num_etiquetas)
-
-        auxY = (y == y[i]).astype(int)
-
+        auxY = (y == i).astype(int)
         ThetasMatriz[i, :] = calcOptTheta(auxY)
         i += 1
 
@@ -78,21 +76,15 @@ def calcAciertos(X, Y, t):
 
     for i in X:      
         p = 0
-
         for x in range(dimThetas):
             valores[p] = sigmoide(np.dot(i, t[x]))
             p+=1
 
-        valores = np.where(valores > 0.1, 0, valores)
         r = np.argmax(valores)
 
-        if r * 1000 < 60:
-            sistema = 1
-        else: sistema = Y[r]
+        print(str(r) + "------>" + str(Y[cont]))
 
-        print(sistema , "------>" ,(Y[cont]))
-
-        if(sistema==Y[cont]):
+        if(r==Y[cont]):
             aciertos+=1     
 
         cont += 1
