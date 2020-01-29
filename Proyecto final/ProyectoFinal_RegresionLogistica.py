@@ -36,7 +36,7 @@ def gradiente(theta, XX, Y, landa):
 def coste_y_gradiente(x0, X, Y, landa):
     return coste(x0,X,Y,landa), gradiente(x0, X, Y, landa)
 
-def calcOptTheta(Y):
+def calcOptTheta(Y, maxIt):
     #result = opt.fmin_tnc(func=coste, x0=np.zeros(X.shape[1]), fprime=gradiente, args=(X, Y, landa))
     #return result[0]
     result = opt.minimize(
@@ -45,11 +45,11 @@ def calcOptTheta(Y):
         args=(X, Y, landa), 
         method='TNC', 
         jac=True, 
-        options={'maxiter': 70})
+        options={'maxiter': maxIt})
 
     return result.x
 
-def oneVsAll(X, y, num_etiquetas, reg):
+def oneVsAll(X, y, num_etiquetas, reg, maxIt):
     
     ThetasMatriz = np.zeros((num_etiquetas, X.shape[1]))
 
@@ -57,9 +57,9 @@ def oneVsAll(X, y, num_etiquetas, reg):
     while i < num_etiquetas:
 
         os.system('cls')
-        print("Numero de etiquetas procesadas: ", i + 1, " de un total de ", num_etiquetas)
+        print("Numero de etiquetas procesadas: ", i + 1, " de un total de ", num_etiquetas, " con lamda = ", landa, " y ", maxIt, " iteraciones.")
         auxY = (y == i).astype(int)
-        ThetasMatriz[i, :] = calcOptTheta(auxY)
+        ThetasMatriz[i, :] = calcOptTheta(auxY, maxIt)
         i += 1
 
     return ThetasMatriz
@@ -82,7 +82,7 @@ def calcAciertos(X, Y, t):
 
         r = np.argmax(valores)
 
-        print(str(r) + "------>" + str(Y[cont]))
+        #print(str(r) + "------>" + str(Y[cont]))
 
         if(r==Y[cont]):
             aciertos+=1     
@@ -95,27 +95,67 @@ def calcAciertos(X, Y, t):
 # Selecciona aleatoriamente ejemplos y los pinta
 def pinta_aleatorio(X):
     sample = np.random.randint(low=0, high=len(X) - 1, size=1)
-    aux = X[sample, :].reshape(-1, 50)
+    aux = X[sample, :].reshape(-1, 20)
     plt.imshow(aux.T)
     plt.axis("off")
 
-#datos.keys() consulta las claves
+def dibuja_puntos(X, Y):
+    a = np.arange(len(X))
+    b = X
+    plt.plot(a, b, c="blue", label="Train")
+
+    d = Y[0:len(X)]
+    plt.plot(a, d, c="orange", label="Cross Validation")
+
+    plt.show()
+
 datos = loadmat("proyecto_final_data_TRAIN.mat")
 
 #almacenamos los datos leídos en X e y
-y = datos["y"]
-X = datos["X"]
+
+X = datos["Xval"]
+y = datos["yval"]
+
 yaux = np.ravel(y) 
 
-landa = 1
+landas = [0.001, 0.01, 0.1, 1, 10, 50, 100, 500, 1000]
+maxIterations = [70, 100, 150, 200, 300, 500]
+num_labels = len(np.unique(yaux))
 
 #pinta_aleatorio(X)
 
-num_labels = len(np.unique(yaux))
+testedLandasValues = dict()
+testedLandas = []
+p = 0
 
-one = oneVsAll(X, yaux, num_labels, landa)
+aciertos = []
+myLandas = []
+myIter = []
 
-print(str(calcAciertos(X, yaux, one)) + "% de acierto")
+for i in landas:
+    for r in maxIterations:
+        landa = i
+        one = (oneVsAll(X, yaux, num_labels, i, r))
+        testedLandasValues[p] = np.mean(one)
+        testedLandas.append(one)
 
-#Mostramos los datos finalmente
-plt.show()  
+        myLandas.append(i)
+        myIter.append(r)
+        aciertos.append(calcAciertos(X, yaux, one))
+        p += 1
+
+os.system('cls')
+print("Porcentajes de aciertos con distintas lambdas: ")
+
+p = 0
+for x in aciertos:
+    print(str(x) + "% de acierto con un valor de lambda = ", myLandas[p], " con ", myIter[p], " iteraciones.")
+    p += 1
+
+val =  aciertos.index(max(aciertos))
+
+print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
+
+dibuja_puntos(myLandas, aciertos)
+
+dibuja_puntos(myIter, aciertos)
