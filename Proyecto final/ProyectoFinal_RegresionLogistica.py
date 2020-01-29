@@ -99,13 +99,13 @@ def pinta_aleatorio(X):
     plt.imshow(aux.T)
     plt.axis("off")
 
-def dibuja_puntos(X, Y):
-    a = np.arange(len(X))
+def dibuja_puntos(X, Y, color):
+    a = 100
     b = X
-    plt.plot(a, b, c="blue", label="Train")
+    plt.plot(a, b, c=color)
 
     d = Y[0:len(X)]
-    plt.plot(a, d, c="orange", label="Cross Validation")
+    plt.plot(a, d, c="orange")
 
     plt.show()
 
@@ -118,8 +118,8 @@ y = datos["yval"]
 
 yaux = np.ravel(y) 
 
-landas = [0.001, 0.01, 0.1, 1, 10, 50, 100, 500, 1000]
-maxIterations = [70, 100, 150, 200, 300, 500]
+landas = [0.001, 0.01, 0.1, 1, 10, 50, 100, 500]
+maxIterations = [70, 100, 150, 200, 300]
 num_labels = len(np.unique(yaux))
 
 #pinta_aleatorio(X)
@@ -156,6 +156,6 @@ val =  aciertos.index(max(aciertos))
 
 print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
 
-dibuja_puntos(myLandas, aciertos)
+dibuja_puntos(aciertos, landas, "blue")
 
-dibuja_puntos(myIter, aciertos)
+dibuja_puntos(myIter, aciertos, "orange")

@@ -108,11 +108,12 @@ X = data["X"]
 
 num_entradas = X.shape[1]
 capa_oculta = 25
-num_labels = 10
 landa = 1
 
+num_labels = len(np.unique(np.ravel(y)))
+
 lenY = len(y)
-#y = (y - 1)
+
 y_onehot = np.zeros((lenY, len(np.unique(y))))
 for i in range(lenY):
     y_onehot[i][y[i]] = 1
@@ -123,11 +124,10 @@ for i in range(lenY):
 
 #Inicialización de dos matrices de pesos de manera aleatoria
 Theta1 = pesosAleatorios(400, lenY) # (25, 401)
-#Theta2 = pesosAleatorios(25, 10) # (10, 26)
+Theta2 = pesosAleatorios(25, num_labels) # (10, 26)
 
 # Crea una lista de Thetas
-#Thetas = [Theta1, Theta2]
-Thetas = Theta1
+Thetas = [Theta1, Theta2]
 
 # Concatenación de las matrices de pesos en un solo vector
 unrolled_Thetas = [Thetas[i].ravel() for i,_ in enumerate(Thetas)]
