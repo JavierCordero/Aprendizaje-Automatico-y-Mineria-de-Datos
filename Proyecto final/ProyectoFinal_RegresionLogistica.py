@@ -100,13 +100,9 @@ def pinta_aleatorio(X):
     plt.axis("off")
 
 def dibuja_puntos(X, Y, color):
-    a = np.arange(100)
+    a = np.arange(len(X))
     b = X
-    plt.plot(a, b, c=color)
-
-    d = Y[0:len(X)]
-    plt.plot(a, d, c="orange")
-
+    plt.plot(a, Y, c=color)
     plt.show()
 
 datos = loadmat("proyecto_final_data_TRAIN.mat")

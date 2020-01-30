@@ -45,7 +45,7 @@ def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     theta1 = np.reshape(params_rn[:num_ocultas * (num_entradas + 1)],
             (num_ocultas, (num_entradas + 1)))
 
-    theta2 = np.reshape(params_rn[num_ocultas * (num_entradas + 1) + 1: ], 
+    theta2 = np.reshape(params_rn[num_ocultas * (num_entradas + 1): ], 
         (num_etiquetas, (num_ocultas + 1)))
 
     a1, z2, a2, z3, h = PropagacionHaciaDelante(X, theta1, theta2)  
@@ -103,19 +103,17 @@ def calcAciertos(Y, h):
 
 data = loadmat("proyecto_final_data_TRAIN.mat")
 
-y = data["y"].ravel()
-X = data["X"]
+y = data["yval"].ravel()
+X = data["Xval"]
 
-num_entradas = len(X)#X.shape[1]
-
+num_entradas = len(X) #X.shape[1]
 capa_oculta = 25
+num_labels = len(np.unique(y))
 landa = 1
 
-num_labels = len(np.unique(np.ravel(y)))
-
 lenY = len(y)
-
-y_onehot = np.zeros((lenY, len(np.unique(y))))
+y = (y - 1)
+y_onehot = np.zeros((lenY, num_labels))
 for i in range(lenY):
     y_onehot[i][y[i]] = 1
 
@@ -124,8 +122,8 @@ for i in range(lenY):
 #Theta1, Theta2 = weights["Theta1"], weights["Theta2"]
 
 #Inicialización de dos matrices de pesos de manera aleatoria
-Theta1 = pesosAleatorios(400, lenY) # (25, 401)
-Theta2 = pesosAleatorios(lenY, num_labels) # (10, 26)
+Theta1 = pesosAleatorios(400, 25) # (25, 401)
+Theta2 = pesosAleatorios(25, 10) # (10, 26)
 
 # Crea una lista de Thetas
 Thetas = [Theta1, Theta2]
