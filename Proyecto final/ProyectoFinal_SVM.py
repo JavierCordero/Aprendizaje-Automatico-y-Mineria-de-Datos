@@ -44,8 +44,8 @@ def pinta_frontera_curva(X, y, model, sigma):
 def parte1():
     data = loadmat("proyecto_final_data_TRAIN.mat")
 
-    X = data["X"]
-    y = data["y"]
+    X = data["Xval"]
+    y = data["yval"]
     yravel = np.ravel(y)
 
     Coef = 1.0
@@ -54,7 +54,7 @@ def parte1():
     svm = svm.fit(X, yravel)
 
     pinta_puntos(X, yravel)
-    pinta_frontera_recta(X,yravel, svm)
+    #pinta_frontera_recta(X,yravel, svm)
 
     plt.show()
 
@@ -64,7 +64,7 @@ def parte1():
     svm = svm.fit(X, yravel)
     
     pinta_puntos(X, yravel)
-    pinta_frontera_recta(X,yravel, svm)
+    #pinta_frontera_recta(X,yravel, svm)
 
     plt.show()
 
@@ -134,13 +134,13 @@ def parte3():
 def main():
 
     #PARTE 6.1.1
-    parte1()
+    #parte1()
 
     #PARTE 6.1.2
     #parte2()
 
     #PARTE 6.1.3
-    #parte3()
+    parte3()
     
 
 main()

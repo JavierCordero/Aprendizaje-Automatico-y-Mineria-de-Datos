@@ -100,7 +100,7 @@ def pinta_aleatorio(X):
     plt.axis("off")
 
 def dibuja_puntos(X, Y, color):
-    a = 100
+    a = np.arange(100)
     b = X
     plt.plot(a, b, c=color)
 
@@ -156,6 +156,6 @@ val =  aciertos.index(max(aciertos))
 
 print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
 
-dibuja_puntos(aciertos, landas, "blue")
+dibuja_puntos(landas, aciertos, "blue")
 
 dibuja_puntos(myIter, aciertos, "orange")

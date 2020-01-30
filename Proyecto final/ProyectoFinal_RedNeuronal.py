@@ -45,7 +45,7 @@ def backprop(params_rn, num_entradas, num_ocultas, num_etiquetas, X, y, reg):
     theta1 = np.reshape(params_rn[:num_ocultas * (num_entradas + 1)],
             (num_ocultas, (num_entradas + 1)))
 
-    theta2 = np.reshape(params_rn[num_ocultas * (num_entradas + 1): ], 
+    theta2 = np.reshape(params_rn[num_ocultas * (num_entradas + 1) + 1: ], 
         (num_etiquetas, (num_ocultas + 1)))
 
     a1, z2, a2, z3, h = PropagacionHaciaDelante(X, theta1, theta2)  
@@ -106,7 +106,8 @@ data = loadmat("proyecto_final_data_TRAIN.mat")
 y = data["y"].ravel()
 X = data["X"]
 
-num_entradas = X.shape[1]
+num_entradas = len(X)#X.shape[1]
+
 capa_oculta = 25
 landa = 1
 
@@ -124,7 +125,7 @@ for i in range(lenY):
 
 #Inicialización de dos matrices de pesos de manera aleatoria
 Theta1 = pesosAleatorios(400, lenY) # (25, 401)
-Theta2 = pesosAleatorios(25, num_labels) # (10, 26)
+Theta2 = pesosAleatorios(lenY, num_labels) # (10, 26)
 
 # Crea una lista de Thetas
 Thetas = [Theta1, Theta2]
