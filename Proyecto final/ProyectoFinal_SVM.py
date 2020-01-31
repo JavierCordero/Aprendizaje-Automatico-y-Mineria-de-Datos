@@ -2,6 +2,7 @@ from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm as supportVectorMachine
+from sklearn.model_selection import train_test_split
 
 def pinta_puntos(X,y):
     pos = np.where(y == 1)
@@ -41,106 +42,55 @@ def pinta_frontera_curva(X, y, model, sigma):
 
     plt.contour(X1, X2, vals, colors="green", linewidths=0.3)
 
+def test(svm, Xval, Yval):
+    pred = svm.predict(Xval)
+    acc = np.mean((pred == Yval).astype(int))
+
+    return acc
+
 def parte1():
-    data = loadmat("proyecto_final_data_TRAIN.mat")
-
-    X = data["Xval"]
-    y = data["yval"]
-    yravel = np.ravel(y)
-
-    Coef = 1.0
-
-    svm = supportVectorMachine.SVC(kernel="linear", C=Coef)
-    svm = svm.fit(X, yravel)
-
-    pinta_puntos(X, yravel)
-    #pinta_frontera_recta(X,yravel, svm)
-
-    plt.show()
-
-    Coef = 100.0
-
-    svm = supportVectorMachine.SVC(kernel="linear", C=Coef)
-    svm = svm.fit(X, yravel)
-    
-    pinta_puntos(X, yravel)
-    #pinta_frontera_recta(X,yravel, svm)
-
-    plt.show()
-
-def parte2():
-    data = loadmat("proyecto_final_data_TRAIN.mat")
-
-    X = data["X"]
-    y = data["y"]
-    yravel = y.ravel()
-    
-    Coef = 1
-    sigma = 0.1
-
-    pinta_puntos(X,yravel)
-
-    svm = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
-    svm = svm.fit(gaussianKernel(X, X, sigma=sigma), yravel)
-
-    pinta_frontera_curva(X, y, svm, sigma)
-
-    plt.show()
-
-def parte3():
     data = loadmat("proyecto_final_data_TRAIN.mat")
 
     X = data["X"]
     y = data["y"]
     Xval = data["Xval"]
     yval = data["yval"]
-
     yravel = y.ravel()
 
-    pinta_puntos(X, yravel)
+    Coef = 1.0
 
-    predictions = dict()
+    svm = supportVectorMachine.SVC(kernel="linear", C=Coef)
+    svm = svm.fit(X, yravel)
 
-    coefVal = 0.01
-    sigmaVal = 0.01
+    prec = test(svm, Xval, Yval)
 
-    x = 0
-    j = 0
+    print(prec)
 
-    for x in range(8):
-        for j in range(8):
-            #Entrena el modelo para x e y
-            model = supportVectorMachine.SVC(C=coefVal, kernel='precomputed', tol= 1e-3, max_iter= 100)
-            model = model.fit(gaussianKernel(X, X, sigma=sigmaVal), yravel)
-
-            prediction = model.predict(gaussianKernel(Xval, X, sigmaVal))
-
-            predictions[(coefVal, sigmaVal)] = np.mean((prediction != yval).astype(int))
-
-            sigmaVal = sigmaVal * 3
-
-        sigmaVal = 0.01
-        coefVal = coefVal * 3   
-
-    Coef, sigma = min(predictions, key=predictions.get)
+def parte2():
+    data = loadmat("proyecto_final_data_TRAIN.mat")
+    
+    X = data["X"]
+    y = data["y"]
+    Xval = data["Xval"]
+    yval = data["yval"]
+    yravel = y.ravel()
+    
+    Coef = 1.0
+    sigma = 0.1
 
     svm = supportVectorMachine.SVC(C=Coef, kernel='precomputed', tol= 1e-3, max_iter= 100)
     svm = svm.fit(gaussianKernel(X, X, sigma=sigma), yravel)
 
-    pinta_frontera_curva(X, y, svm, sigma)
-  
-    plt.show()
+    prec = test(svm, Xval, Yval)
+
+    print(prec)
 
 def main():
 
-    #PARTE 6.1.1
-    #parte1()
+    #PARTE 1
+    parte1()
 
-    #PARTE 6.1.2
+    #PARTE 2
     #parte2()
-
-    #PARTE 6.1.3
-    parte3()
-    
 
 main()
