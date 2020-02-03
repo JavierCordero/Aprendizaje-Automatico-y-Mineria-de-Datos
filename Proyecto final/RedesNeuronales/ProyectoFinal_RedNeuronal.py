@@ -7,6 +7,7 @@ from checkNNGradients import checkNNGradients
 from displayData import displayData
 import scipy.io as sciOutput
 import os
+import time
 
 # Función sigmoide
 def sigmoide(x):
@@ -95,6 +96,9 @@ def calcAciertos(Y, h):
     totales = len(Y)
     dimThetas = len(h)
 
+    print(totales)
+    print(dimThetas)
+
     for i in range(dimThetas):
         r = np.argmax(h[i])
         if(r==Y[i]):
@@ -103,12 +107,11 @@ def calcAciertos(Y, h):
     porcentaje = aciertos / totales * 100
     return porcentaje
 
-
 def runApplication():
 
     os.system('cls')
     print("Comenzando a trabajar...")
-
+    tic = time.time()
     data = loadmat("../proyecto_final_data_TRAIN.mat")
 
     y = data["y"].ravel()
@@ -125,6 +128,7 @@ def runApplication():
     myLandas = []
     myIter = []
     myOcultas = []
+    thetas = []
 
     lenY = len(y)
     y_onehot = np.zeros((lenY, num_labels))
@@ -172,24 +176,30 @@ def runApplication():
                 myLandas.append(l)
                 myIter.append(mi)
                 myOcultas.append(numC)
+                thetas.append(h)
 
-                # Cálculo de la precisión de la red neuronal
-                #print("{0:.2f}% de precision".format(calcAciertos(y,h)))
                 os.system('cls')
                 print("Num de datos procesados: " , aux ," de un total " , tam, " combinaciones.")
                 aux+=1
 
     val =  aciertos.index(max(aciertos))
 
-    print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
-    saveOutputData(myLandas, myIter, aciertos, myOcultas)
+    saveOutputData(myLandas, myIter, aciertos, myOcultas, thetas)
 
-def saveOutputData(myLandas, myIter, myAciertos, myOcultas):
+    print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones y ", myOcultas[val] , " capas ocultas.")
+    toc = time.time()
+
+    print("Tiempo empleado para entrenar el sistema: ", round((toc - tic) / 60.), " minutos, ", (toc - tic), " segundos.")
+
+    printOutputData()
+
+def saveOutputData(myLandas, myIter, myAciertos, myOcultas, thetas):
     dict = {
         "landas": myLandas,
         "iterations": myIter,
         "aciertos" : myAciertos,
-        "capasOcultas" : myOcultas
+        "capasOcultas" : myOcultas,
+        "thetas" : thetas
     }
 
     sciOutput.savemat("RedesNeuronalesOutput.mat", dict)
@@ -242,7 +252,40 @@ def dibuja_puntos(X, Y, color, simbolo):
 
     plt.show()
 
+def calcula_aciertos_validacion():
+    datos = loadmat("../proyecto_final_data_TRAIN.mat")
+    datos2 = loadmat("RedesNeuronalesOutput.mat")
+
+    yval = datos["yval"]
+
+    yaux = np.ravel(yval)
+    aciertos = []
+
+    thetas = datos2["thetas"]
+
+    print(len(yaux))
+
+    for x in thetas:
+        print(len(x))
+        aciertos.append(calcAciertos(yaux, x))
+
+    val =  aciertos.index(max(aciertos))
+
+    print("Mejor porcentaje de acierto con los datos de validacion: ", str(aciertos[val]) + "%")
+
+    return thetas[val]
+
+def calcula_aciertos_test(thetaOpt):
+    datos = loadmat("../proyecto_final_data_TRAIN.mat")
+
+    ytest = datos["ytest"]
+
+    ytest = np.ravel(ytest)
+
+    print("Mejor porcentaje de acierto con los datos de test: ", str(calcAciertos(ytest, thetaOpt)) + "%")
+
 def main():
     #runApplication()
-    printOutputData()
+    thetaOpt = calcula_aciertos_validacion()
+    calcula_aciertos_test(thetaOpt)
 main()    

@@ -86,7 +86,6 @@ def calcAciertos(X, Y, t):
     porcentaje = aciertos / totales * 100
     return porcentaje
 
-# Selecciona aleatoriamente ejemplos y los pinta
 def pinta_aleatorio(X):
     sample = np.random.randint(low=0, high=len(X) - 1, size=1)
     aux = X[sample, :].reshape(-1, 20)
@@ -130,23 +129,25 @@ def runApplication():
 
     val =  aciertos.index(max(aciertos)) #Lo mismo que max(testedThetasValues)
 
-    print("Mejor porcentaje de acierto: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
+    print("Mejor porcentaje de acierto para entrenamiento: " ,str(aciertos[val]) + "% de acierto con un valor de lambda = ", myLandas[val], " con ", myIter[val], " iteraciones.")
 
-    saveOutputData(myLandas, myIter, aciertos, ones[val])
+    saveOutputData(myLandas, myIter, aciertos, testedThetas)
 
-    return testedThetas[val]
+    return testedThetas
 
-def saveOutputData(myLandas, myIter, myAciertos, mejorTheta):
+def saveOutputData(myLandas, myIter, myAciertos, thetas):
     dict = {
         "landas": myLandas,
         "iterations": myIter,
         "aciertos" : myAciertos,
-        "mejorTheta" : mejorTheta
+        "thetas" : thetas
     }
 
     sciOutput.savemat("RegresionLogisticaOutput.mat", dict)
 
     print("Matriz guardada en ", "RegresionLogisticaOutput.mat")
+
+    printOutputData()
 
 def printOutputData():
 
@@ -193,30 +194,41 @@ def dibuja_puntos(X, Y, color, simbolo):
 
     plt.show()
 
-def calcula_aciertos_entrenamiento(thetaOpt):
+def calcula_aciertos_validacion():
     datos = loadmat("../proyecto_final_data_TRAIN.mat")
-
+    datos2 = loadmat("RegresionLogisticaOutput.mat")
     #almacenamos los datos leídos en X e y
     Xval = datos["Xval"]
     yval = datos["yval"]
+
+    yaux = np.ravel(yval)
+    aciertos = []
+
+    thetas = datos2["thetas"]
+
+    for x in thetas:
+        aciertos.append(calcAciertos(Xval, yaux, x))
+
+    val =  aciertos.index(max(aciertos))
+
+    print("Mejor porcentaje de acierto con los datos de validacion: ", str(aciertos[val]) + "%")
+
+    return thetas[val]
+
+def calcula_aciertos_test(thetaOpt):
+    datos = loadmat("../proyecto_final_data_TRAIN.mat")
+
     Xtest = datos["Xtest"]
     ytest = datos["ytest"]
 
-    yaux = np.ravel(yval)
-    ytestaux = np.ravel(ytest) 
+    ytest = np.ravel(ytest)
 
-    #He calculado con los datos de entrenamiento. Ahora esa theta se lo paso a los de validacion y me quedo con la mejor.
-    #Despues, se lo paso a los de test y es el porcentaje de acierto final
-
-    print("Mejor porcentaje de acierto con los datos de entrenamiento: ", str(calcAciertos(Xval, yaux, thetaOpt)) + "%")
-    print("Mejor porcentaje de acierto con los datos de test: " , str(calcAciertos(Xtest, ytestaux, thetaOpt)) + "%")
+    print("Mejor porcentaje de acierto con los datos de test: ", str(calcAciertos(Xtest, ytest, thetaOpt)) + "%")
 
 def main():
-    thetaOpt = runApplication()
-    printOutputData()
-    calcula_aciertos_entrenamiento(thetaOpt)
-
-
+    #thetasEntrenamiento = runApplication()
+    thetasOpt = calcula_aciertos_validacion()
+    calcula_aciertos_test(thetasOpt)
 
 main()
 

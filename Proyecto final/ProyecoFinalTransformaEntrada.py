@@ -20,7 +20,6 @@ def transform_images_inside_path(path, outputName):
     matTestX = []
     matTestY = []
 
-    #y = np.array(genfromtxt('train.csv', delimiter=',', dtype=None, encoding=None))
     y = np.array(8) #airplane, car, cat, dog, flower, fruit, motorbike, person
     y = {0,1,2,3,4,5,6,7}
     
@@ -64,8 +63,6 @@ def transform_images_inside_path(path, outputName):
 
             if(processedImage):              
                 aux = paths.index(concretePath)
-               
-                #index, = np.where(np.unique(y) == aux)
 
                 #Dividir en entrenamiento 60%, validación 20% y test 20%
                 if procesImages - 1 < (int)(0.2 * totalFiles):
